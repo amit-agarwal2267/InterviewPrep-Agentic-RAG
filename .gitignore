@@ -1,0 +1,56 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+*$py.class
+build/
+dist/
+wheels/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*service-account*.json
+
+# Editors and operating systems
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Logs and local data
+*.log
+*.sqlite3
+.cache/
+
+# local scripts
+cleanup.sh
+docker-compose.local.yml
+scripts/
+
+# Frontend dependencies and generated output
+interview-prep-frontend/node_modules/
+interview-prep-frontend/.next/
+interview-prep-frontend/out/
+interview-prep-frontend/build/
+interview-prep-frontend/coverage/
+interview-prep-frontend/.vercel/
+interview-prep-frontend/.env*
+!interview-prep-frontend/.env.example
+interview-prep-frontend/*.tsbuildinfo
+interview-prep-frontend/npm-debug.log*
+interview-prep-frontend/yarn-debug.log*
+interview-prep-frontend/pnpm-debug.log*
