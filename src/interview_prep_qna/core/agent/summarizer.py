@@ -4,14 +4,15 @@ from typing import Any
 from langchain_core.language_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable
-from langchain_groq import ChatGroq
+# from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 from interview_prep_qna.core.agent.decisions import SummarizerDecision
 from interview_prep_qna.core.agent.enums import GroundingAlignment
 from interview_prep_qna.core.agent.prompts import SUMMARIZER_SYSTEM_PROMPT
 from interview_prep_qna.core.agent.state import AgentState
 from interview_prep_qna.core.config import get_settings
-from interview_prep_qna.observability import get_langfuse_client
+from interview_prep_qna.observability import get_langfuse_callbacks, get_langfuse_client
 
 _LATEX_MACROS = {
     r"\\rightarrow": "→",
@@ -69,17 +70,25 @@ class SummarizerAgent:
     ) -> Runnable[dict[str, Any], SummarizerDecision]:
         settings = get_settings()
         if model is None:
-            primary = ChatGroq(
-                model=settings.groq_model,
-                api_key=settings.groq_api_key,
+            # primary = ChatGroq(
+            #     model=settings.groq_model,
+            #     api_key=settings.groq_api_key,
+            #     temperature=0.1,
+            #     max_tokens=500,
+            # )
+            primary = ChatGoogleGenerativeAI(
+                model=settings.google_flash_model,
+                api_key=settings.google_genai_api_key,
                 temperature=0.1,
-                max_tokens=512,
+                max_tokens=1000,
+                retries=2,
             ).with_structured_output(SummarizerDecision, method="json_schema")
-            fallback = ChatGroq(
-                model=settings.groq_fallback_model,
-                api_key=settings.groq_api_key,
+            fallback = ChatGoogleGenerativeAI(
+                model=settings.google_fallback_flash_model,
+                api_key=settings.google_genai_api_key,
                 temperature=0.1,
-                max_tokens=512,
+                max_tokens=1000,
+                retries=2,
             ).with_structured_output(SummarizerDecision, method="json_schema")
             structured_model = primary.with_fallbacks(
                 [fallback], exceptions_to_handle=(Exception,)
@@ -142,7 +151,8 @@ class SummarizerAgent:
             },
         ) as observation:
             result = await self._summarizer.ainvoke(
-                {"query": query, "draft": draft, "grounding": grounding}
+                {"query": query, "draft": draft, "grounding": grounding},
+                config={"callbacks": get_langfuse_callbacks()},
             )
             decision = SummarizerDecision.model_validate(result)
             if grounding["generic_external_sources"]:

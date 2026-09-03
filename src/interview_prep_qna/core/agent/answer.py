@@ -9,7 +9,7 @@ from interview_prep_qna.core.agent.prompts import ANSWER_SYSTEM_PROMPT
 from interview_prep_qna.core.agent.state import AgentState, RetrievedEvidence
 from interview_prep_qna.core.agent.summarizer import SummarizerAgent
 from interview_prep_qna.core.config import get_settings
-from interview_prep_qna.observability import get_langfuse_client
+from interview_prep_qna.observability import get_langfuse_callbacks, get_langfuse_client
 
 
 class AnswerAgent:
@@ -32,14 +32,12 @@ class AnswerAgent:
                 model=settings.gemini_reasoning_model,
                 api_key=settings.google_genai_api_key,
                 temperature=0.2,
-                max_tokens=settings.answer_max_tokens,
                 retries=0,
             )
             fallback = ChatGoogleGenerativeAI(
                 model=settings.gemini_fallback_reasoning_model,
                 api_key=settings.google_genai_api_key,
                 temperature=0.2,
-                max_tokens=settings.answer_max_tokens,
                 retries=0,
             )
             model = primary.with_fallbacks(
@@ -136,7 +134,10 @@ class AnswerAgent:
             chunks: list[str] = []
             async for result in self._responder.astream(
                 {"query": query.strip(), "evidence": self._format_evidence(evidence)},
-                config={"tags": ["answer_generation"]},
+                config={
+                    "tags": ["answer_generation"],
+                    "callbacks": get_langfuse_callbacks(),
+                },
             ):
                 content = result.content if hasattr(result, "content") else result
                 if isinstance(content, list):

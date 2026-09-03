@@ -13,7 +13,7 @@ from interview_prep_qna.core.agent.prompts import ROUTER_SYSTEM_PROMPT
 from interview_prep_qna.core.agent.retrieval import RAGPipeline
 from interview_prep_qna.core.agent.state import AgentState
 from interview_prep_qna.core.config import get_settings
-from interview_prep_qna.observability import get_langfuse_client
+from interview_prep_qna.observability import get_langfuse_callbacks, get_langfuse_client
 
 __all__ = ["RouteDestination", "RouterAgent", "RouterDecision"]
 logger = logging.getLogger(__name__)
@@ -79,7 +79,8 @@ class RouterAgent:
         ) as observation:
             try:
                 result = await self._router.ainvoke(
-                    {"query": query.strip(), "history": history or []}
+                    {"query": query.strip(), "history": history or []},
+                    config={"callbacks": get_langfuse_callbacks()},
                 )
                 decision = RouterDecision.model_validate(result)
             except Exception:

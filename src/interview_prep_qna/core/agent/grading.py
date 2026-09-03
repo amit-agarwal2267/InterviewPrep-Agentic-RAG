@@ -3,7 +3,8 @@ from typing import Any
 from langchain_core.language_models import BaseChatModel
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import Runnable
-from langchain_groq import ChatGroq
+# from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 from interview_prep_qna.core.agent.answer import AnswerAgent
 from interview_prep_qna.core.agent.decisions import GradingDecision
@@ -14,7 +15,7 @@ from interview_prep_qna.core.agent.generic import GenericAgent
 from interview_prep_qna.core.agent.prompts import GRADING_SYSTEM_PROMPT
 from interview_prep_qna.core.agent.state import AgentState, RetrievedEvidence
 from interview_prep_qna.core.config import get_settings
-from interview_prep_qna.observability import get_langfuse_client
+from interview_prep_qna.observability import get_langfuse_callbacks, get_langfuse_client
 
 
 class GradingAgent:
@@ -41,21 +42,27 @@ class GradingAgent:
     ) -> Runnable[dict[str, Any], GradingDecision]:
         if model is None:
             settings = get_settings()
-            if not settings.groq_api_key:
-                raise ValueError("GROQ_API_KEY is required for GradingAgent")
-            primary = ChatGroq(
-                model=settings.groq_model,
-                api_key=settings.groq_api_key,
+            # primary = ChatGroq(
+            #     model=settings.groq_model,
+            #     api_key=settings.groq_api_key,
+            #     temperature=0,
+            #     max_tokens=500,
+            #     max_retries=0,
+            #     timeout=45,
+            # )
+            primary = ChatGoogleGenerativeAI(
+                model=settings.google_flash_model,
+                api_key=settings.google_genai_api_key,
                 temperature=0,
-                max_retries=0,
-                timeout=45,
+                max_tokens=1000,
+                retries=2,
             ).with_structured_output(GradingDecision, method="json_schema")
-            fallback = ChatGroq(
-                model=settings.groq_fallback_model,
-                api_key=settings.groq_api_key,
+            fallback = ChatGoogleGenerativeAI(
+                model=settings.google_fallback_flash_model,
+                api_key=settings.google_genai_api_key,
                 temperature=0,
-                max_retries=0,
-                timeout=45,
+                max_tokens=1000,
+                retries=2,
             ).with_structured_output(GradingDecision, method="json_schema")
             structured_model = primary.with_fallbacks(
                 [fallback], exceptions_to_handle=(Exception,)
@@ -112,7 +119,8 @@ class GradingAgent:
                     "evidence": self._format_evidence(evidence),
                     "stage": stage,
                     "available_actions": ", ".join(available_actions),
-                }
+                },
+                config={"callbacks": get_langfuse_callbacks()},
             )
             decision = GradingDecision.model_validate(result)
             if decision.action not in available_actions:

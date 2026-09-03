@@ -10,7 +10,7 @@ from interview_prep_qna.core.agent.prompts import GENERIC_SYSTEM_PROMPT
 from interview_prep_qna.core.agent.state import AgentState
 from interview_prep_qna.core.agent.summarizer import SummarizerAgent
 from interview_prep_qna.core.config import get_settings
-from interview_prep_qna.observability import get_langfuse_client
+from interview_prep_qna.observability import get_langfuse_callbacks, get_langfuse_client
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +85,8 @@ class GenericAgent:
         ) as observation:
             try:
                 result = await self._responder.ainvoke(
-                    {"query": query, "reason": reason, "context": context}
+                    {"query": query, "reason": reason, "context": context},
+                    config={"callbacks": get_langfuse_callbacks()},
                 )
                 response = _content_text(result).strip()
             except Exception:

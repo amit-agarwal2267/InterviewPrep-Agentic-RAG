@@ -39,7 +39,6 @@ class Settings(BaseSettings):
     gemini_fallback_reasoning_model: str = "gemini-3.6-flash"
     answer_min_words: int = 600
     answer_max_words: int = 900
-    answer_max_tokens: int = 2_500
     google_flash_model: str = "gemini-3.5-flash-lite"
     google_fallback_flash_model: str = "gemini-3.1-flash-lite"
     groq_api_key: SecretStr | None = None

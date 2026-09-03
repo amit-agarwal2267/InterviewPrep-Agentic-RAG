@@ -1,0 +1,96 @@
+{
+  "total_requests_scored": 60,
+  "warmup_requests_excluded": 20,
+  "failed": 3,
+  "overall": {
+    "mean_s": 30.340246178579005,
+    "p50_s": 27.397036982000827,
+    "p95_s": 48.54350773659896,
+    "min_s": 13.266449613999612,
+    "max_s": 60.396711608999794,
+    "n": 57
+  },
+  "by_label": {
+    "rag_github": {
+      "mean_s": 30.340246178579005,
+      "p95_s": 48.54350773659896,
+      "n": 57
+    }
+  },
+  "per_node": {
+    "answer": {
+      "mean_s": 6.253053030250044,
+      "pct_of_total": 20.609763656647125,
+      "n": 8
+    },
+    "contextualizer": {
+      "mean_s": 3.187387618491285,
+      "pct_of_total": 10.505477113569576,
+      "n": 57
+    },
+    "generic": {
+      "mean_s": 5.263701388632826,
+      "pct_of_total": 17.348907974086032,
+      "n": 49
+    },
+    "github": {
+      "mean_s": 8.433284826370254,
+      "pct_of_total": 27.795703359600193,
+      "n": 27
+    },
+    "grading": {
+      "mean_s": 7.154821377842079,
+      "pct_of_total": 23.581948991875905,
+      "n": 57
+    },
+    "interrogator": {
+      "mean_s": 0.006302837539860775,
+      "pct_of_total": 0.020773851018752582,
+      "n": 50
+    },
+    "rag": {
+      "mean_s": 0.9491708934034537,
+      "pct_of_total": 3.1284218585991326,
+      "n": 57
+    },
+    "router": {
+      "mean_s": 4.333212464526425,
+      "pct_of_total": 14.28206099258939,
+      "n": 57
+    },
+    "summarizer": {
+      "mean_s": 5.2136903045438086,
+      "pct_of_total": 17.18407383333893,
+      "n": 57
+    },
+    "web": {
+      "mean_s": 5.117299810000077,
+      "pct_of_total": 16.866375374412822,
+      "n": 1
+    }
+  },
+  "escalation_paths": {
+    "contextualizer -> router -> rag -> grading -> github -> grading -> generic -> summarizer -> interrogator": 25,
+    "contextualizer -> router -> rag -> grading -> generic -> summarizer -> interrogator": 24,
+    "contextualizer -> router -> rag -> grading -> answer -> summarizer": 6,
+    "contextualizer -> router -> rag -> grading -> github -> grading -> web -> grading -> answer -> summarizer -> interrogator": 1,
+    "contextualizer -> router -> rag -> grading -> github -> grading -> answer -> summarizer": 1
+  },
+  "failures": [
+    {
+      "label": "rag_github",
+      "query": "The Lab Diagnostic Voice AI Agent currently records metrics in structured logs rather than Prometheus or Grafana. Which metrics, traces, and alerts would you add first to operate it in production, and how would you correlate a user's call, agent handoffs, database queries, and external model requests?",
+      "error": "The AI service is temporarily rate-limited. Please try again in a moment."
+    },
+    {
+      "label": "rag_github",
+      "query": "The Lab Diagnostic Voice AI Agent currently records metrics in structured logs rather than Prometheus or Grafana. Which metrics, traces, and alerts would you add first to operate it in production, and how would you correlate a user's call, agent handoffs, database queries, and external model requests?",
+      "error": "The AI service is temporarily rate-limited. Please try again in a moment."
+    },
+    {
+      "label": "rag_github",
+      "query": "The Lab Diagnostic Voice AI Agent currently records metrics in structured logs rather than Prometheus or Grafana. Which metrics, traces, and alerts would you add first to operate it in production, and how would you correlate a user's call, agent handoffs, database queries, and external model requests?",
+      "error": "The AI service is temporarily rate-limited. Please try again in a moment."
+    }
+  ]
+}

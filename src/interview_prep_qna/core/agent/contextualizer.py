@@ -12,7 +12,7 @@ from interview_prep_qna.core.agent.enums import QueryRoute
 from interview_prep_qna.core.agent.prompts import CONTEXTUALIZER_SYSTEM_PROMPT
 from interview_prep_qna.core.agent.state import AgentState
 from interview_prep_qna.core.config import get_settings
-from interview_prep_qna.observability import get_langfuse_client
+from interview_prep_qna.observability import get_langfuse_callbacks, get_langfuse_client
 
 __all__ = ["ContextualizerAgent", "ContextualizerDecision", "QueryRoute"]
 logger = logging.getLogger(__name__)
@@ -77,7 +77,8 @@ class ContextualizerAgent:
         ) as observation:
             try:
                 result = await self._classifier.ainvoke(
-                    {"query": query.strip(), "history": history or []}
+                    {"query": query.strip(), "history": history or []},
+                    config={"callbacks": get_langfuse_callbacks()},
                 )
                 decision = ContextualizerDecision.model_validate(result)
             except Exception:
@@ -110,6 +111,7 @@ class ContextualizerAgent:
         if not query.strip():
             raise ValueError("query must not be empty")
         result = self._classifier.invoke(
-            {"query": query.strip(), "history": history or []}
+            {"query": query.strip(), "history": history or []},
+            config={"callbacks": get_langfuse_callbacks()},
         )
         return ContextualizerDecision.model_validate(result)

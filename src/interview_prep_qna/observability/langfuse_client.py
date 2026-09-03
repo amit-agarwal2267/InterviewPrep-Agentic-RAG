@@ -2,6 +2,7 @@ import logging
 from functools import lru_cache
 
 from langfuse import Langfuse
+from langfuse.langchain import CallbackHandler
 
 from interview_prep_qna.core.config import get_settings
 
@@ -44,6 +45,14 @@ def get_langfuse_client() -> Langfuse:
         extra={"configured": configured, "environment": settings.langfuse_environment},
     )
     return client
+
+
+def get_langfuse_callbacks() -> list[CallbackHandler]:
+    """Return callbacks for native LangChain usage and cost capture."""
+    if not is_langfuse_configured():
+        return []
+    settings = get_settings()
+    return [CallbackHandler(public_key=settings.langfuse_public_key)]
 
 
 def shutdown_langfuse() -> None:
